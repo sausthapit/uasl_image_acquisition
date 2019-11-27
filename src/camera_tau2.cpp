@@ -142,7 +142,8 @@ void CamTau2::init(const std::string& cam_id)
     {
         std::cerr << "[Tau2] could not open camera, check connection." << std::endl;
         p_grab.reset();
-        return;
+        throw std::runtime_error("[Tau2] could not open camera, check connection");
+
     }
 
     std::cout << "[Tau2] Camera " << p_grab->getCameraSerialNumber() << " has been opened successfully" << std::endl;

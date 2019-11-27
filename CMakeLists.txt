@@ -16,16 +16,17 @@ endfunction()
 find_package(OpenCV REQUIRED)#Depend on your version of OpenCV and ROS installed. If your cv_bridge package relies on OpenCV 2, find_package(OpenCV 2 REQUIRED) is what you need. Else, find_package(OpenCV REQUIRED) will automatically look for OpenCV3.
 find_package(Threads REQUIRED)
 
-option(BUILD_ROS_NODE "Build ROS node" ON)
+option(BUILD_ROS_NODE "Build ROS node" OFF)
 option(TAU2_DRIVER "Build libthermalgrabber" ON)
 option(TAU2_LEGACY_CODE "Build legacy code for sensoray grabber" OFF)
+option(BUILD_GPS "Enable GPS" ON)
 
 #RPATH parameters
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-
 if(BUILD_ROS_NODE)
+#	set(catkin_DIR /opt/ros)
 	find_package(catkin REQUIRED COMPONENTS roscpp cv_bridge image_transport)
 endif(BUILD_ROS_NODE)
 
@@ -36,7 +37,7 @@ endif()
 EXECUTE_PROCESS(COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCH)#Get the architecture to locate the correct librairies
 
 file(GLOB HEADERS "include/${PROJECT_NAME}/*.hpp")
-
+set(MVBLUEFOX_TOP_LEVEL_PATH /media/saurav/Data/Downloads/mvBlueFOX/mvIMPACT_acquire)
 #search for mvBLueFOX libraries (64 bits) ----------------------------------------------
 if(NOT MVBLUEFOX_TOP_LEVEL_PATH)
 set(MVBLUEFOX_TOP_LEVEL_PATH /opt/mvIMPACT_acquire)
@@ -155,14 +156,29 @@ endif(TAU2_LEGACY_CODE)
 #All libs ----------------------------------------------
 if(MVDEVICEMANAGER_LIBRARY AND TAU2_DRIVER)
 	add_executable(stereo_example examples/stereo_example.cpp)
-	target_link_libraries(stereo_example acq_seq tau2_acq bluefox_acq)
+	target_link_libraries(stereo_example acq_seq tau2_acq)
 endif(MVDEVICEMANAGER_LIBRARY AND TAU2_DRIVER)
 
+
+if(BUILD_GPS)
+	set(CMAKE_THREAD_PREFER_PTHREAD)
+	set(xsens_gps_location /usr/local/xsens)
+	include_directories(${xsens_gps_location}/include)
+	find_library(xstypes_LIB xstypes HINTS ${xsens_gps_location}/lib)
+	find_library(xsController_LIB xstypes HINTS ${xsens_gps_location}/lib)
+	find_library(xsensdeviceapi_LIB xsensdeviceapi HINTS ${xsens_gps_location}/lib)
+	add_executable(tau_stereo examples/tau_stereo.cpp src/XSensGPS.cpp)
+	target_link_libraries(tau_stereo
+			acq_seq tau2_acq
+			${xstypes_LIB}
+			${xsensdeviceapi_LIB}
+			${CMAKE_THREAD_LIBS_INIT}
+			${OpenCV_LIBRARIES})
+endif(BUILD_GPS)
+
 include_directories(
-  include/${PROJECT_NAME}
-  ${TAU2_DRIVER_INCLUDE_PATH}
-  ${OpenCV_INCLUDE_DIRS}
-  ${MVBLUEFOX_INCLUDE_PATH}
+		include/${PROJECT_NAME}
+		${TAU2_DRIVER_INCLUDE_PATH}
+		${OpenCV_INCLUDE_DIRS}
+		${MVBLUEFOX_INCLUDE_PATH}
 )
-
-

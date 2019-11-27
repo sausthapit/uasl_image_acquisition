@@ -8,7 +8,7 @@
 #include "opencv2/core/version.hpp"
 #if CV_MAJOR_VERSION == 2
 #include <opencv2/core/core.hpp>
-#elif CV_MAJOR_VERSION == 3
+#elif CV_MAJOR_VERSION >= 3
 #include <opencv2/core.hpp>
 #endif
 

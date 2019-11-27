@@ -131,7 +131,8 @@ void Acquisition::thread_func()
 		const bool only_one_camera = (cam_number == 1);//If there is a unique camera
 
 		//Open the trigger if more than 1 camera is started
-		if(!only_one_camera)
+//		if((!only_one_camera)&&use_trigger)
+		if(use_trigger)
 		{
 			#ifdef __unix__
 			{//Lock for the port_name, if one day atomic strings exist, feel free to obliterate this horror
@@ -249,6 +250,14 @@ void Acquisition::set_trigger_port_name(const std::string& portname_){
 	std::lock_guard<std::mutex> lock(trigger_port_name_mtx);
 	trigger_port_name = portname_;
 }
+
+    bool Acquisition::isUseTrigger() const {
+        return use_trigger;
+    }
+
+    void Acquisition::setUseTrigger(bool useTrigger) {
+        use_trigger = useTrigger;
+    }
 
 } //namespace cam
 

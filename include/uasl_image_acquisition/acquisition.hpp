@@ -13,7 +13,7 @@
 #include "opencv2/core/version.hpp"
 #if CV_MAJOR_VERSION == 2
 #include <opencv2/core/core.hpp>
-#elif CV_MAJOR_VERSION == 3
+#elif CV_MAJOR_VERSION >= 3
 #include <opencv2/core.hpp>
 #endif
 
@@ -131,7 +131,11 @@ class Acquisition
 
 	void thread_func();//Acquisition function launched by the acquisition thread
 	void close_cameras();//Close each camera
+bool use_trigger= false;
+public:
+        bool isUseTrigger() const;
 
+        void setUseTrigger(bool useTrigger);
 }; //class Acquisition
 
 class Acquisition_lock

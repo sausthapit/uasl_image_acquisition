@@ -9,7 +9,7 @@
 #if CV_MAJOR_VERSION == 2
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#elif CV_MAJOR_VERSION == 3
+#elif CV_MAJOR_VERSION >= 3
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #endif
