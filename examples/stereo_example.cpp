@@ -13,7 +13,7 @@
 
 #include "acquisition.hpp" //The main class
 #include "camera_tau2.hpp" //You need the header corresponding to the specific camera you are using
-#include "camera_mvbluefox.hpp"
+//#include "camera_mvbluefox.hpp"
 #include "util_signal.hpp" //For the signal handling
 
 
@@ -54,16 +54,18 @@ int main(int argc, char** argv)
     cam::SigHandler sig_handle;
 
 	cam::Acquisition acq;
-    acq.add_camera<cam::bluefox>("25000812");
+    //acq.add_camera<cam::bluefox>("25000812");
     acq.add_camera<cam::tau2>("FT2HKAW5");
-
+	acq.add_camera<cam::tau2>();
     std::vector<cv::Mat> img_vec;
 
     //parameters
+    dynamic_cast<cam::Tau2Parameters&>(acq.get_cam_params(0)).set_pixel_format(CV_16U);
+    dynamic_cast<cam::Tau2Parameters&>(acq.get_cam_params(0)).set_image_roi(0,16,640,480);
     dynamic_cast<cam::Tau2Parameters&>(acq.get_cam_params(1)).set_pixel_format(CV_16U);
     dynamic_cast<cam::Tau2Parameters&>(acq.get_cam_params(1)).set_image_roi(0,16,640,480);
-    dynamic_cast<cam::BlueFoxParameters&>(acq.get_cam_params(0)).set_image_roi(56,0,640,480);
-    dynamic_cast<cam::BlueFoxParameters&>(acq.get_cam_params(0)).set_exposure_time(150);
+    //dynamic_cast<cam::BlueFoxParameters&>(acq.get_cam_params(0)).set_image_roi(56,0,640,480);
+    //dynamic_cast<cam::BlueFoxParameters&>(acq.get_cam_params(0)).set_exposure_time(150);
 
     //start acquisition
 	acq.set_trigger_port_name("/dev/ttyTRIGGER");
@@ -79,7 +81,8 @@ int main(int argc, char** argv)
 			for(unsigned i = 0;i<img_vec.size();++i)
 			{
 				cv::Mat img = img_vec[i].clone();
-				if(i==1){ // equalisation for infrared image
+				//if(i==1)
+				{ // equalisation for infrared image
                     double m = 20.0/64.0;
                     double mean_img = cv::mean(img)[0];
                     img = img * m + (127-mean_img* m);
